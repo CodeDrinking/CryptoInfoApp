@@ -1,7 +1,7 @@
  import React from "react"
- import Exchanges  from "./Exchanges"
+
  import { VStack ,Heading ,Text} from '@chakra-ui/react'
-import { Scale } from "chart.js";
+
 
  
  

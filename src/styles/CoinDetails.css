@@ -1,0 +1,15 @@
+
+
+
+
+input{
+    margin: 2rem;
+    border: 2px solid red;
+    border-radius: 4px;
+}
+button{
+    height: 40px;
+    width: 60px;
+    background-color: green;
+    color: white;
+}

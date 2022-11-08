@@ -3,8 +3,9 @@ import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { server } from '../index'
 import Loader from './Loader'
-import ExchangeCard from './ExchangeCard'
+import CoinsCard from './CoinsCard'
 import ErrorComponent from '../components/ErrorComponent'
+import ExchangeCard from './ExchangeCard'
 
 const Exchanges = () => {
 
