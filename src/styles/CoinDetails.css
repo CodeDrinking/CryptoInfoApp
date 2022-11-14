@@ -2,12 +2,13 @@
 
 
 
-input{
+#input1{
     margin: 2rem;
     border: 2px solid red;
     border-radius: 4px;
+    display: inline-block;
 }
-button{
+#btn-1{
     height: 40px;
     width: 60px;
     background-color: green;

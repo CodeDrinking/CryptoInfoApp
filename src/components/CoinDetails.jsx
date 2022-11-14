@@ -1,11 +1,12 @@
-import { Container ,Box, HStack, RadioGroup, Radio, VStack, Text, Image, StatLabel,StatNumber,Stat, StatHelpText, StatArrow, Badge, Progress } from '@chakra-ui/react'
+import { Container ,Box, HStack, RadioGroup, Radio, VStack, Text, Image, StatLabel,StatNumber,Stat, StatHelpText, StatArrow, Badge, Progress, Button } from '@chakra-ui/react'
 import axios from 'axios'
 import React , {useState ,useEffect} from 'react'
-// import "../styles/CoinDetails.css"
+import "../styles/CoinDetails.css"
 import {useParams} from "react-router-dom"
 import { server } from '..'
 import ErrorComponent from './ErrorComponent'
 import Loader from './Loader'
+import Chart from '../components/Chart'
 
 const CoinDetails = () => {
 
@@ -14,17 +15,73 @@ const CoinDetails = () => {
   const [loading, setloading] = useState(true)
   const [Error ,setError] =useState(false) 
   const [currency ,setCurrency] = useState("inr")
+  const [days ,setDays] =useState("24h")
+  const [chartArray , setChartArray] =useState([]);
 
   const params = useParams();
   const currencySymbol =currency === "inr" ? "₹" : currency === "eur" ? "€" : "$";
+
+  const btns = ["24h" ,"7d" , "14d" , "30" , "60d" ,"200d", "1y" , "max"]
+
+  const switchChartsStats =(key)=> {
+    switch (key) {
+      case "24h":
+        setDays("24h")
+        setloading(true);
+        break;
+        case "7d":
+        setDays("7d")
+        setloading(true);
+        break;
+        
+        case "14d":
+          setDays("14h");
+          setloading(true);
+          break;
+
+          
+        case "30d":
+          setDays("30d")
+          setloading(true);
+          break;
+
+        case "60d":
+          setDays("60d")
+          setloading(true);
+              break;
+
+        case "200d":
+          setDays("200d")
+          setloading(true);
+          break;
+
+          case "1y":
+            setDays("1y")
+            setloading(true);
+            break;  
+
+        case "max":
+          setDays("max")
+          setloading(true);
+          break;
+    
+      default:
+        setDays("24h")
+        setloading(true);
+        break;
+    }
+  }
 
 
   useEffect(() => {
     const fetchCoin = async () => {
      try{
-      const { data } = await axios.get(`${server}/coins/${params.id }`)
+      const { data } = await axios.get(`${server}/coins/${params.id }`);
+      const {data :chartData} = await axios.get(`${server}/coins/${params.id}/market_chart?vs_currency=${currency}&days=${days}`)
+      console.log(chartData);
       console.log(data);
       setCoin(data)
+      setChartArray(chartData.prices)
       setloading(false);   
     
      }
@@ -34,7 +91,7 @@ const CoinDetails = () => {
      }
     } 
     fetchCoin();
-  }, [params.id])
+  }, [params.id , currency,days])
   if(Error) return <ErrorComponent message={"Error while fetching coin"}/> 
 
   return <Container maxW={"container.xl"}>
@@ -42,9 +99,19 @@ const CoinDetails = () => {
       loading ? (<Loader/>):(
         <>
         <Box width={"full"} borderWidth={1}>
-          aadadvd
+          <Chart arr={chartArray} currency={currencySymbol}/>
         </Box>
-{/* button */}
+
+
+        <HStack padding={"4"} wrap={"wrap"}>
+          {
+            btns.map((i) => (
+              <Button key={i} onClick={() => switchChartsStats(i)}>{i}</Button>
+            ))
+          }
+
+        </HStack>
+
         <RadioGroup value={currency} onChange={setCurrency} p={"8"}>
         <HStack  spacing={"4"}>
           <Radio value={"inr"}>INR</Radio>
@@ -78,7 +145,11 @@ const CoinDetails = () => {
       low={`${currencySymbol}${coin.market_data.low_24h[currency]}`}/>
 
       <Box w={"full"}  p="4">
-        <Item title={"Max Supply"} value ={4324} />
+        <Item title={"Max Supply"} value ={coin.market_data.max_supply} />
+        <Item title={"Circulating Supply"} value ={coin.market_data.circulating_supply} />
+        <Item title={"Market Cap"} value ={`${currencySymbol} ${coin.market_data.market_cap[currency]}`} />
+        <Item title={"All Time Low"} value ={`${currencySymbol} ${coin.market_data.atl[currency]}`} />
+        <Item title={"All Time High"} value ={`${currencySymbol} ${coin.market_data.ath[currency]}`} />
       </Box>
       </VStack>
 
@@ -117,8 +188,11 @@ export default CoinDetails
 //     name : "",
 //     age : "",
 //     surname : "",
-//     // address : "",
-//     // education : ""
+//     address : "",
+//     gender : "",
+//     country :"",
+//     upload  : "",
+
 //   })
 //   const handleInput =(e) => {
   
@@ -134,21 +208,45 @@ export default CoinDetails
 //       <div id=''>
 //       <div>
 //       <label htmlFor="">Name</label>
-//       <input name='name' type="text"  onChange={handleInput}/>
+//       <input id='input1' name='name' type="text"  onChange={handleInput}/>
 //       </div>
 
 //       <div>
 //       <label htmlFor="">surname</label>
-//       <input name="surname" type="text"  onChange={handleInput}/>
+//       <input id='input1' name="surname" type="text"  onChange={handleInput}/>
 //       </div>
 
 //       <div>
 //       <label htmlFor="">age</label>
-//       <input name="age" type="text"  onChange={handleInput}/>
+//       <input id='input1' name="age" type="text"  onChange={handleInput}/>
+//       </div>
+      
+//       <div>
+//         select Gender
+//         <input id='input1' type="radio" name ="gender" onChange={handleInput} />
+//         <label htmlFor="" name ="gender">  Male</label>
+//         <input id='input1' type="radio" name='gender' onChange={handleInput}/>
+//         <label htmlFor="" name ="gender"> Female</label>
+//       </div>
+
+//       <div>
+//         <label htmlFor="">upload</label>
+//         <input id='input1' type="file" name="upload"  onChange={handleInput} />
+//       </div>
+//       <div>
+//         <label htmlFor="">Address</label>
+//         <textarea id='input1' name="address"  cols="15" rows="4"  onChange={handleInput}></textarea>
+//       </div>
+//       <div>
+//       <select name='country' id="country" onChange={handleInput}>
+//             <option  id='input1' name="country"    >India</option>
+//             <option  id='input1' name="country"  >Sri Lanka</option>
+//             <option  id='input1'name="country"  >Australia</option>
+//         </select>
 //       </div>
 
 
-//       <button >submit</button>
+//       <button id='btn-1'>submit</button>
 //       </div>
 //     </form>
 //   )
